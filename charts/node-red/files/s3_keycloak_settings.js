@@ -36,7 +36,7 @@ module.exports = {
              audit: false
          }
      },
-     storageModule: require("node-red-contrib-storage-s3"),
+     storageModule: require("@sapianco/node-red-contrib-storage-s3"),
      exportGlobalContextKeys: false,
      externalModules: {
      },

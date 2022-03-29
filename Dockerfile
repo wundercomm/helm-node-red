@@ -1,7 +1,8 @@
 FROM nodered/node-red:2.2.2-12
 
 RUN npm install @exlinc/keycloak-passport
-RUN npm install --save https://github.com/sapianco/node-red-contrib-storage-s3-advanced
+RUN npm install --save @sapianco/node-red-contrib-storage-s3
+#RUN npm install --save node-red-contrib-storage-s3
 RUN npm install --save node-red-contrib-natsio
 RUN npm install --save node-red-contrib-matrix-chat 
 

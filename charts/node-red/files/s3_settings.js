@@ -9,7 +9,7 @@ module.exports = {
              audit: false
          }
      },
-     storageModule: require("node-red-contrib-storage-s3"),
+     storageModule: require("node-red-contrib-storage-s3-advanced"),
      exportGlobalContextKeys: false,
      externalModules: {
      },
