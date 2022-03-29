@@ -1,0 +1,134 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "node-red.fullname" . }}
+  labels:
+    {{- include "node-red.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "node-red.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "node-red.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "node-red.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            {{- if .Values.s3 }}
+            - name: S3_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: s3-{{ include "node-red.fullname" . }}
+                  key: s3-access-key-id
+            - name: S3_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: s3-{{ include "node-red.fullname" . }}
+                  key: s3-secret-access-key
+            - name: S3_BUCKET
+              value: {{ .Values.s3.s3Bucket | quote }}
+            - name: S3_APP_NAME
+              value: {{ .Values.s3.s3AppName | quote }}
+            - name: S3_REGION
+              value: {{ .Values.s3.s3Region | quote }}
+            - name: S3_ENDPOINT
+              value: {{ .Values.s3.s3Endpoint | quote }}
+            - name: S3_FORCE_PATH_STYLE
+              value: {{ .Values.s3.s3ForcePathStyle | quote }}
+            - name: S3_SIGNATURE_VERSION
+              value: {{ .Values.s3.s3SignatureVersion | quote }}
+            {{- end }}
+            {{- if .Values.keycloak }}
+            - name: KEYCLOAK_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-{{ include "node-red.fullname" . }}
+                  key: keycloak-client-id
+            - name: KEYCLOAK_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: keycloak-{{ include "node-red.fullname" . }}
+                  key: keycloak-client-secret
+            - name: KEYCLOAK_HOST
+              value: {{ .Values.keycloak.host | quote }}
+            - name: KEYCLOAK_REALM
+              value: {{ .Values.keycloak.realm | quote }}
+            - name: KEYCLOAK_CALLBACK_URL
+              value: {{ .Values.keycloak.callbackUrl | quote }}
+            - name: KEYCLOAK_AUTHORIZATION_URL
+              value: {{ .Values.keycloak.authorizationUrl | quote }}
+            - name: KEYCLOAK_TOKEN_URL
+              value: {{ .Values.keycloak.tokenUrl | quote }}
+            - name: KEYCLOAK_USER_INFO_URL
+              value: {{ .Values.keycloak.userInfoUrl | quote }}
+            - name: KEYCLOAK_LABEL
+              value: {{ .Values.keycloak.label | quote }}
+            {{- end }}
+          {{- if .Values.keycloak }}
+          {{- if .Values.s3 }}
+          args: ["--settings", "/conf/node-red/s3_keycloak_settings.js"]
+          {{- end }}
+          {{- end }}
+          {{- if .Values.s3 }}
+          {{- if not .Values.keycloak }}
+          args: ["--settings", "/conf/node-red/s3_settings.js"]
+          {{- end }}
+          {{- end }}
+          {{- if .Values.keycloak }}
+          {{- if not .Values.s3 }}
+          args: ["--settings", "/conf/node-red/keycloak_settings.js"]
+          {{- end }}
+          {{- end }}
+          ports:
+            - name: http
+              containerPort: 1880
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          volumeMounts:
+            - name: node-red-settings
+              mountPath: /conf/node-red/
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      volumes:
+      - name: node-red-settings
+        configMap:
+          name: {{ include "node-red.fullname" . }}
