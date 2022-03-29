@@ -1,4 +1,4 @@
-FROM nodered/node-red:2.2.12
+FROM nodered/node-red:2.2.2-12
 
 RUN npm install @exlinc/keycloak-passport
 RUN npm install --save https://github.com/sapianco/node-red-contrib-storage-s3-advanced
