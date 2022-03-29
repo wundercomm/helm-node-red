@@ -18,18 +18,18 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
-version: 2.0.5
+version: 2.2.12
 
 # This is the version number of the application being deployed. This version number should be
 # incremented each time you make changes to the application. Versions are not expected to
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
-appVersion: "2.0.5-sapian-r1"
+appVersion: "2.2.12-wundercomm-r1"
 
-home: https://git.sapian.com.co/Sapian/node-red-docker
+home: https://github.com/wundercomm/helm-node-red
 icon: https://nodered.org/about/resources/media/node-red-icon-2.png
 sources:
-- https://git.sapian.com.co/Sapian/node-red-docker
+- https://github.com/wundercomm/helm-node-red
 maintainers:
 - name: Sebastian Rojo
-  email: sebastian.rojo@sapian.com.co
+  email: arpagon@wundercomm.com
