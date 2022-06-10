@@ -5,6 +5,7 @@ RUN npm install --save @sapianco/node-red-contrib-storage-s3
 #RUN npm install --save node-red-contrib-storage-s3
 RUN npm install --save node-red-contrib-natsio
 RUN npm install --save node-red-contrib-matrix-chat 
+RUN npm install --save node-red-contrib-md5
 
 ARG BUILD_DATE
 ARG VCS_REF
